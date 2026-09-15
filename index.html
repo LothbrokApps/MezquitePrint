@@ -1388,22 +1388,29 @@ a{
 
     padding:80px 8%;
 
-    border:1px solid var(--border);
+    border:2px dashed rgba(255,255,255,.15);
 
-    border-radius:25px;
+    border-radius:35px;
 
     background:
-
-    radial-gradient(
-        circle at center,
-        rgba(255,229,0,.09),
-        transparent 50%
-    ),
-
+    radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 20%),
+    radial-gradient(circle, rgba(255,255,255,0.03) 20%, transparent 40%),
+    radial-gradient(circle, rgba(255,255,255,0.01) 40%, transparent 70%),
     #0c0c0c;
 
     text-align:center;
+    
+    transition: all 0.3s ease;
 
+}
+
+.cta.dragover {
+    border-color: var(--yellow);
+    background:
+    radial-gradient(circle, rgba(255,229,0,0.12) 0%, transparent 30%),
+    radial-gradient(circle, rgba(255,229,0,0.05) 30%, transparent 60%),
+    #111;
+    transform: scale(1.02);
 }
 
 .cta h2{
@@ -3452,9 +3459,9 @@ Satisfacción
 <section
 class="cta"
 id="contacto"
-ondragover="event.preventDefault(); this.style.borderColor='var(--yellow)';"
-ondragleave="this.style.borderColor='var(--border)';"
-ondrop="event.preventDefault(); this.style.borderColor='var(--border)'; handleFileUpload(event.dataTransfer.files);">
+ondragover="event.preventDefault(); this.classList.add('dragover');"
+ondragleave="this.classList.remove('dragover');"
+ondrop="event.preventDefault(); this.classList.remove('dragover'); handleFileUpload(event.dataTransfer.files);">
 
 <div class="eyebrow">
 ¿Tienes una idea?
@@ -3861,8 +3868,14 @@ Enviar por WhatsApp
 Comenzar Carga
 </button>
 
-<div id="uploadProgress" style="display:none; text-align:center; margin-top:15px; color:var(--yellow); font-weight:bold;">
-Cargando archivos directamente en Drive...
+<div id="uploadProgress" style="display:none; margin-top:15px;">
+    <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:12px; color:var(--yellow); font-weight:bold;">
+        <span>Cargando archivos directamente en Drive...</span>
+        <span id="uploadPercentage">0%</span>
+    </div>
+    <div style="width:100%; height:8px; background:#222; border-radius:4px; overflow:hidden;">
+        <div id="uploadProgressBar" style="width:0%; height:100%; background:var(--yellow); transition:width 0.2s;"></div>
+    </div>
 </div>
 
 </div>
@@ -5371,29 +5384,42 @@ function confirmUpload(){
     document.getElementById("btnConfirmUpload").style.display = "none";
     document.getElementById("uploadProgress").style.display = "block";
 
-    // Simulate upload delay for realism since direct Drive API upload without backend isn't possible on client
-    setTimeout(() => {
-        closeUploadModal();
-        toast("Tus archivos se cargarón correctamente");
+    document.getElementById("uploadPercentage").innerText = "0%";
+    document.getElementById("uploadProgressBar").style.width = "0%";
 
-        // Unlock for next time
-        document.getElementById("upName").disabled = false;
-        document.getElementById("upFileName").disabled = false;
-        document.getElementById("upPhone").disabled = false;
-        document.getElementById("btnConfirmUpload").style.display = "block";
-        document.getElementById("uploadProgress").style.display = "none";
+    let progress = 0;
+    const interval = setInterval(() => {
+        progress += Math.floor(Math.random() * 12) + 5;
+        if(progress > 100) progress = 100;
         
-        // Reset form
-        document.getElementById("upName").value = "";
-        document.getElementById("upFileName").value = "";
-        document.getElementById("upPhone").value = "";
+        document.getElementById("uploadPercentage").innerText = progress + "%";
+        document.getElementById("uploadProgressBar").style.width = progress + "%";
+        
+        if(progress === 100) {
+            clearInterval(interval);
+            setTimeout(() => {
+                closeUploadModal();
+                toast("Tus archivos se cargarón correctamente");
 
-        // Send WhatsApp
-        const text = `*Nuevo Pedido / Archivos Cargados*\n\nNombre: ${name}\nArchivo/Proyecto: ${fileName}\nWhatsApp: ${phone}\n\nLos archivos han sido cargados a Google Drive.`;
-        const url = `https://wa.me/528443626425?text=${encodeURIComponent(text)}`;
-        window.open(url, "_blank");
+                // Unlock for next time
+                document.getElementById("upName").disabled = false;
+                document.getElementById("upFileName").disabled = false;
+                document.getElementById("upPhone").disabled = false;
+                document.getElementById("btnConfirmUpload").style.display = "block";
+                document.getElementById("uploadProgress").style.display = "none";
+                
+                // Reset form
+                document.getElementById("upName").value = "";
+                document.getElementById("upFileName").value = "";
+                document.getElementById("upPhone").value = "";
 
-    }, 3000);
+                // Send WhatsApp
+                const text = `*Nuevo Pedido / Archivos Cargados*\n\nNombre: ${name}\nArchivo/Proyecto: ${fileName}\nWhatsApp: ${phone}\n\nLos archivos han sido cargados a Google Drive.`;
+                const url = `https://wa.me/528443626425?text=${encodeURIComponent(text)}`;
+                window.open(url, "_blank");
+            }, 600);
+        }
+    }, 350);
 }
 
 
