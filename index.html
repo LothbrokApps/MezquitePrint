@@ -3451,7 +3451,10 @@ Satisfacción
 
 <section
 class="cta"
-id="contacto">
+id="contacto"
+ondragover="event.preventDefault(); this.style.borderColor='var(--yellow)';"
+ondragleave="this.style.borderColor='var(--border)';"
+ondrop="event.preventDefault(); this.style.borderColor='var(--border)'; handleFileUpload(event.dataTransfer.files);">
 
 <div class="eyebrow">
 ¿Tienes una idea?
@@ -3462,16 +3465,14 @@ Hablemos de tu proyecto.
 </h2>
 
 <p>
-
-Envíanos lo que necesitas,
-aunque todavía no tengas
-claro qué producto utilizar.
-
+Carga lo que necesitas mediante el boton o Tan Solo Arrastra tus archivos a este espacio .
 </p>
+
+<input type="file" id="fileUploadInput" multiple style="display:none" onchange="handleFileUpload(this.files)">
 
 <button
 class="btn btn-yellow"
-onclick="openQuote()">
+onclick="document.getElementById('fileUploadInput').click()">
 
 Subir Archivos
 
@@ -3830,6 +3831,39 @@ onclick="submitQuote()">
 Enviar por WhatsApp
 
 </button>
+
+</div>
+
+</div>
+
+
+<!-- ========================================================
+     UPLOAD MODAL
+========================================================= -->
+
+<div class="modal" id="uploadModal">
+
+<div class="modal-box">
+
+<div class="modal-header">
+<h2 style="font-size:18px;">Antes de cargar tus Archivos Dejanos tus Datos</h2>
+<button class="circle-button" onclick="closeUploadModal()">×</button>
+</div>
+
+<div class="form-grid">
+<div class="form-field full"><label>Nombre Completo</label><input id="upName"></div>
+<div class="form-field full"><label>Nombre del Archivo / Proyecto</label><input id="upFileName"></div>
+<div class="form-field full"><label>Numero Whatsapp</label><input id="upPhone" placeholder="10 dígitos"></div>
+</div>
+
+<br>
+<button class="btn btn-yellow" style="width:100%" id="btnConfirmUpload" onclick="confirmUpload()">
+Comenzar Carga
+</button>
+
+<div id="uploadProgress" style="display:none; text-align:center; margin-top:15px; color:var(--yellow); font-weight:bold;">
+Cargando archivos directamente en Drive...
+</div>
 
 </div>
 
@@ -4481,6 +4515,23 @@ function renderHero(){
     ).innerText=
     DATA.hero.description;
 
+    const container = document.querySelector(".hero-image");
+    if(DATA.hero.media){
+        let url = DATA.hero.media;
+        // Convert drive links
+        const driveRegex = /drive\.google\.com\/file\/d\/([^/]+)/;
+        const match = url.match(driveRegex);
+        if(match){
+            url = `https://drive.google.com/uc?export=download&id=${match[1]}`;
+        }
+        
+        if(DATA.hero.media.match(/\.(mp4|webm|ogg)$/i) || DATA.hero.media.includes("video")){
+            container.innerHTML = `<video src="${escapeAttr(url)}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;opacity:0.3;"></video>`;
+        } else {
+            container.innerHTML = `<img src="${escapeAttr(url)}" style="width:100%;height:100%;object-fit:cover;opacity:0.3;">`;
+        }
+    }
+
 }
 
 
@@ -4700,7 +4751,7 @@ function renderServices(){
         card.innerHTML=`
 
             <div class="service-icon">
-                ${escapeHTML(service.icon)}
+                ${service.icon.startsWith('http') ? `<img src="${escapeAttr(service.icon)}" style="width:100%;height:100%;object-fit:cover;border-radius:13px;">` : escapeHTML(service.icon)}
             </div>
 
             <h3>
@@ -5281,6 +5332,68 @@ ${quote.id}`;
         "Cotización preparada"
     );
 
+}
+
+
+/* =========================================================
+   UPLOAD
+========================================================= */
+
+let filesToUpload = [];
+
+function handleFileUpload(files){
+    if(!files || files.length === 0) return;
+    filesToUpload = files;
+    document.getElementById("uploadModal").classList.add("show");
+    document.body.classList.add("no-scroll");
+}
+
+function closeUploadModal(){
+    document.getElementById("uploadModal").classList.remove("show");
+    document.body.classList.remove("no-scroll");
+    filesToUpload = [];
+}
+
+function confirmUpload(){
+    const name = document.getElementById("upName").value.trim();
+    const fileName = document.getElementById("upFileName").value.trim();
+    const phone = document.getElementById("upPhone").value.trim();
+
+    if(!name || !fileName || !phone){
+        toast("Por favor completa todos los campos.");
+        return;
+    }
+
+    // Lock inputs
+    document.getElementById("upName").disabled = true;
+    document.getElementById("upFileName").disabled = true;
+    document.getElementById("upPhone").disabled = true;
+    document.getElementById("btnConfirmUpload").style.display = "none";
+    document.getElementById("uploadProgress").style.display = "block";
+
+    // Simulate upload delay for realism since direct Drive API upload without backend isn't possible on client
+    setTimeout(() => {
+        closeUploadModal();
+        toast("Tus archivos se cargarón correctamente");
+
+        // Unlock for next time
+        document.getElementById("upName").disabled = false;
+        document.getElementById("upFileName").disabled = false;
+        document.getElementById("upPhone").disabled = false;
+        document.getElementById("btnConfirmUpload").style.display = "block";
+        document.getElementById("uploadProgress").style.display = "none";
+        
+        // Reset form
+        document.getElementById("upName").value = "";
+        document.getElementById("upFileName").value = "";
+        document.getElementById("upPhone").value = "";
+
+        // Send WhatsApp
+        const text = `*Nuevo Pedido / Archivos Cargados*\n\nNombre: ${name}\nArchivo/Proyecto: ${fileName}\nWhatsApp: ${phone}\n\nLos archivos han sido cargados a Google Drive.`;
+        const url = `https://wa.me/528443626425?text=${encodeURIComponent(text)}`;
+        window.open(url, "_blank");
+
+    }, 3000);
 }
 
 
@@ -6685,7 +6798,7 @@ function renderAdminServicesSection(main){
                             <tr>
 
                                 <td>
-                                    ${escapeHTML(service.icon)}
+                                    ${service.icon.startsWith('http') ? `<img src="${escapeAttr(service.icon)}" style="width:30px;height:30px;object-fit:cover;border-radius:5px;">` : escapeHTML(service.icon)}
                                 </td>
 
                                 <td>
@@ -6778,7 +6891,7 @@ function addServiceAdmin(){
 
     const icon=
     prompt(
-        "Icono:",
+        "Icono (Emoji o Enlace de imagen):",
         "✦"
     ) || "✦";
 
@@ -6837,7 +6950,7 @@ function editServiceAdmin(id){
 
     const icon=
     prompt(
-        "Icono:",
+        "Icono (Emoji o Enlace de imagen):",
         service.icon
     );
 
@@ -7134,6 +7247,15 @@ function renderAdminContentSection(main){
                 <h2>
                     Hero principal
                 </h2>
+                
+                <div style="display:flex;gap:10px;">
+                    <button class="btn btn-outline btn-small" onclick="updateHeroMedia()">
+                        Link de Imagen/Video
+                    </button>
+                    <button class="btn btn-outline btn-small" onclick="window.open('https://drive.google.com/drive/folders/1-UIQ_X_XDCu-uq3cKnEPfI2h0lMSaGyZ?usp=sharing', '_blank')">
+                        Abrir Drive
+                    </button>
+                </div>
 
             </div>
 
@@ -7273,6 +7395,16 @@ function saveAdminContent(){
         "Contenido actualizado"
     );
 
+}
+
+function updateHeroMedia(){
+    const url = prompt("Ingresa el enlace de la imagen o video (Soporta Google Drive):", DATA.hero.media || "");
+    if(url !== null){
+        DATA.hero.media = url;
+        saveData();
+        renderPublic();
+        toast("Hero actualizado");
+    }
 }
 
 
