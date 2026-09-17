@@ -1,16 +1,16 @@
 /* =========================================================
-   PRINTLAB DATA
+   MEZQUITE DATA
 ========================================================= */
 
 const DEFAULT_DATA = {
 
     settings:{
 
-        businessName:"PRINTLAB",
+        businessName:"MEZQUITE",
 
         whatsapp:"8440000000",
 
-        email:"hola@printlab.mx",
+        email:"hola@mezquite.mx",
 
         city:"Saltillo, Coahuila",
 
@@ -426,7 +426,7 @@ function loadData(){
 
         const saved =
         localStorage.getItem(
-            "PRINTLAB_DATABASE"
+            "MEZQUITE_DATABASE"
         );
 
         if(saved){
@@ -459,7 +459,7 @@ function loadData(){
 function saveData(){
 
     localStorage.setItem(
-        "PRINTLAB_DATABASE",
+        "MEZQUITE_DATABASE",
         JSON.stringify(DATA)
     );
 
@@ -519,7 +519,7 @@ function imageFallback(){
             font-family="Arial"
             font-weight="900">
 
-            PRINTLAB
+            MEZQUITE
 
         </text>
 
@@ -715,7 +715,7 @@ function renderProducts(){
                 <img
                     src="${escapeAttr(product.image)}"
                     alt="${escapeAttr(product.name)}"
-                    onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                    onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
             </div>
 
@@ -852,7 +852,7 @@ function renderGallery(){
             <img
                 src="${escapeAttr(item.image)}"
                 alt="${escapeAttr(item.title)}"
-                onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
             <div class="gallery-overlay">
 
@@ -1001,7 +1001,7 @@ function renderCart(){
 
                 <img
                     src="${escapeAttr(product.image)}"
-                    onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                    onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
                 <div class="cart-item-info">
 
@@ -1127,7 +1127,7 @@ function openProduct(id){
             <img
                 src="${escapeAttr(product.image)}"
                 alt="${escapeAttr(product.name)}"
-                onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
         </div>
 
@@ -1585,7 +1585,7 @@ function performSearch(){
                 object-fit:cover;
                 border-radius:7px;
                 "
-                onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
             <div>
 
@@ -1792,7 +1792,7 @@ function renderAdminLogin(){
 
                 <p>
                     Acceso al centro de control
-                    de PRINTLAB.
+                    de MEZQUITE.
                 </p>
 
 
@@ -2066,7 +2066,7 @@ function renderAdminDashboardSection(main){
             <div>
 
                 <div class="eyebrow">
-                    PRINTLAB
+                    MEZQUITE
                 </div>
 
                 <h1>
@@ -2423,7 +2423,7 @@ function renderAdminProductCard(product){
             <img
                 src="${escapeAttr(product.image)}"
                 alt="${escapeAttr(product.name)}"
-                onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
 
             <div class="admin-product-body">
@@ -3107,7 +3107,7 @@ function renderAdminGallerySection(main){
                             <img
                                 src="${escapeAttr(item.image)}"
                                 alt="${escapeAttr(item.title)}"
-                                onerror="this.src='data:image/svg+xml;charset=UTF-8,${encodeURIComponent(imageFallback())}'">
+                                onerror=\"this.onerror=null; this.src='assets/logo.png'; this.style.filter='brightness(0) invert(1)'; this.style.padding='40%'; this.style.backgroundColor='#111'; this.style.objectFit='contain';\">
 
                             <div
                                 class="admin-product-body">
@@ -3175,7 +3175,7 @@ function addGalleryAdmin(){
     const title=
     prompt(
         "Nombre del proyecto:"
-    ) || "Proyecto PRINTLAB";
+    ) || "Proyecto MEZQUITE";
 
 
     DATA.gallery.push({
@@ -3781,7 +3781,7 @@ function exportQuotes(){
 
 
     downloadFile(
-        "printlab-cotizaciones.csv",
+        "mezquite-cotizaciones.csv",
         csv,
         "text/csv;charset=utf-8"
     );
@@ -4014,7 +4014,7 @@ function renderAdminSettingsSection(main){
 
                 La contraseña actual de demostración
                 es <strong style="color:#fff">
-                PRINTLAB2026
+                MEZQUITE2026
                 </strong>.
 
                 <br><br>
@@ -4089,7 +4089,7 @@ function exportData(){
     );
 
     downloadFile(
-        "printlab-database.json",
+        "mezquite-database.json",
         json,
         "application/json"
     );
